@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"Web_Api/config"
+	"Web_Api/models"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -72,7 +73,13 @@ func LoggerToFile() gin.HandlerFunc {
 			)
 
 		if c.Request.Method != "GET" && c.Request.Method != "OPTIONS" {
-			menu := m
+			menu := models.Menu{}
+			menu.Path = reqUrl
+			menu.Action = reqMethod
+			menuList, _ := menu.Get()
+			sysOperLog := models.SysOperLog{}
+			sysOperLog.OperId = clientIP
+			sysOperLog.OperLocation =
 		}
 
 	}
