@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	orm "Web_Api/database"
+	"time"
+)
 
 //sys_operlog
 type SysOperLog struct {
@@ -28,4 +31,81 @@ type SysOperLog struct {
 	LatencyTime   string    `json:"latencyime" gorm:"type:varchar(128);"`    //耗时
 	UserAgent     string    `json:"userAgent" gorm:"type:varchar(255);"`     //ua
 	BaseModel
+}
+
+func (SysOperLog) TableName() string {
+	return "sys_operlog"
+}
+
+func (e *SysOperLog) Get() (SysOperLog, error) {
+	var doc SysOperLog
+	table := orm.Eloquent.Table(e.TableName())
+	if e.OperIp != "" {
+		table.Where("oper_ip = ?", e.OperIp)
+	}
+	if e.OperId != 0 {
+		table = table.Where("oper_id = ?", e.OperId)
+	}
+	if err := table.First(&doc).Error; err != nil {
+		return doc, err
+	}
+	return doc, nil
+}
+
+func (e *SysOperLog) GetPage(pageSize int, pageIndex int) ([]SysOperLog, int, error) {
+	var doc []SysOperLog
+	table := orm.Eloquent.Select("*").Table(e.TableName())
+	if e.OperIp != "" {
+		table = table.Where("oper_ip = ?", e.OperIp)
+	}
+	if e.Status != "" {
+		table = table.Where("status = ?", e.Status)
+	}
+	if e.OperName != "" {
+		table = table.Where("oper_name = ?", e.OperName)
+	}
+	if e.BusinessType != "" {
+		table = table.Where("busuness_type = ?", e.BusinessType)
+	}
+	var count int
+
+	if err := table.Order("oper_id desc").Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&doc).Error; err != nil {
+		return nil, 0, err
+	}
+	table.Count(&count)
+	return doc, count, nil
+}
+
+func (e *SysOperLog) Create() (SysOperLog, error) {
+	var doc SysOperLog
+	e.CreateBy = "0"
+	e.UpdateBy = "0"
+	result := orm.Eloquent.Table(e.TableName()).Create(&e)
+	if result.Error != nil {
+		err := result.Error
+		return doc, err
+	}
+	doc = *e
+	return doc, nil
+}
+
+func (e *SysOperLog) Update(id int) (update SysOperLog, err error) {
+	if err = orm.Eloquent.Table(e.TableName()).First(&update, id).Error; err != nil {
+		return
+	}
+
+	//参数1:是要修改的数据
+	//参数2:是修改的数据
+	if err = orm.Eloquent.Table(e.TableName()).Model(&update).Updates(&e).Error; err != nil {
+		return
+	}
+	return
+}
+
+func (e *SysOperLog) BatchDelete(id []int) (Result bool, err error) {
+	if err = orm.Eloquent.Table(e.TableName()).Where(" oper_id in (?)", id).Delete(&SysOperLog{}).Error; err != nil {
+		return
+	}
+	Result = true
+	return
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -91,8 +92,37 @@ func LoggerToFile() gin.HandlerFunc {
 				sysOperLog.BusinessType = "10"
 				sysOperLog.Title = "用户登录"
 				sysOperLog.OperName = "-"
+			} else if strings.Contains(reqUrl, "/api/v1/logout") {
+				// 判断字符串s是否包含子串substr
+				sysOperLog.BusinessType = "11"
+			} else if strings.Contains(reqUrl, "/api/v1/getCaptcha") {
+				sysOperLog.BusinessType = "12"
+				sysOperLog.Title = "验证码"
+			} else {
+				if reqMethod == "POST" {
+					sysOperLog.BusinessType = "1"
+				} else if reqMethod == "PUT" {
+					sysOperLog.BusinessType = "2"
+				} else if reqMethod == "DELETE" {
+					sysOperLog.BusinessType = "3"
+				}
 			}
-
+			sysOperLog.Method = reqMethod
+			if len(menuList) >0 {
+				sysOperLog.Title = menuList[0].Title
+			}
+			b, _ := c.Get("body")
+			sysOperLog.OperName, _ = utils.StructToJsonStr(b)
+			sysOperLog.CreateBy = utils.GetUserName(c)
+			sysOperLog.OperTime = utils.GetCurrntTime()
+			sysOperLog.LatencyTime = (latencyTime).String()
+			sysOperLog.UserAgent = c.Request.UserAgent()
+			if c.Err() == nil {
+				sysOperLog.Status = "0"
+			} else {
+				sysOperLog.Status = "1"
+			}
+			 _, _ = sysOperLog.Create()
 		}
 
 	}
