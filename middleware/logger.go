@@ -84,7 +84,15 @@ func LoggerToFile() gin.HandlerFunc {
 			sysOperLog.OperIp = clientIP
 			sysOperLog.OperLocation = utils.GetLocation(clientIP)
 			sysOperLog.Status = utils.IntToString(statusCode)
-			sysOperLog.OperName = utils.
+			sysOperLog.OperName = utils.GetRoleName(c)
+			sysOperLog.RequestMethod = c.Request.Method
+			sysOperLog.OperUrl = reqUrl
+			if reqUrl == "/login" {
+				sysOperLog.BusinessType = "10"
+				sysOperLog.Title = "用户登录"
+				sysOperLog.OperName = "-"
+			}
+
 		}
 
 	}
