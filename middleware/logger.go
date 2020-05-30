@@ -3,6 +3,7 @@ package middleware
 import (
 	"Web_Api/config"
 	"Web_Api/models"
+	"Web_Api/pkg/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -53,6 +54,8 @@ func LoggerToFile() gin.HandlerFunc {
 
 		// 请求id
 		clientIP := c.ClientIP()
+
+		// 日志格式
 		logger.Infof("%3d  %13v  %15s  %s  %s\r\n",
 			statusCode,
 			latencyTime,
@@ -78,8 +81,10 @@ func LoggerToFile() gin.HandlerFunc {
 			menu.Action = reqMethod
 			menuList, _ := menu.Get()
 			sysOperLog := models.SysOperLog{}
-			sysOperLog.OperId = clientIP
-			sysOperLog.OperLocation =
+			sysOperLog.OperIp = clientIP
+			sysOperLog.OperLocation = utils.GetLocation(clientIP)
+			sysOperLog.Status = utils.IntToString(statusCode)
+			sysOperLog.OperName = utils.
 		}
 
 	}
