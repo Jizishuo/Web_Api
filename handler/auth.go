@@ -128,3 +128,26 @@ func LogOut(c *gin.Context) {
 	})
 
 }
+
+func Authorizator(data interface{}, c *gin.Context) bool {
+
+	if v, ok := data.(map[string]interface{}); ok {
+		u, _ := v["user"].(models.SysUser)
+		r, _ := v["role"].(models.SysRole)
+		c.Set("role", r.RoleName)
+		c.Set("roleIds", r.RoleId)
+		c.Set("userId", u.UserId)
+		c.Set("userName", u.UserName)
+		c.Set("dataScope", r.DataScope)
+
+		return true
+	}
+	return false
+}
+
+func Unauthorized(c *gin.Context, code int, message string) {
+	c.JSON(http.StatusOK, gin.H{
+		"code": code,
+		"msg":  message,
+	})
+}

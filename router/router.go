@@ -5,6 +5,7 @@ import (
 	"Web_Api/middleware"
 	"github.com/gin-gonic/gin"
 	"Web_Api/handler"
+	"log"
 )
 
 func InitRouter() *gin.Engine {
@@ -31,5 +32,9 @@ func InitRouter() *gin.Engine {
 	}
 	// the jwt middleware
 	authMiddleware, err := middleware.AuthInit()
+	if err!=nil {
+		log.Fatalln("JWT Error", err.Error())
+	}
+	// Refresh time can be longer than token timeout
 
 }
