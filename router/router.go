@@ -29,4 +29,6 @@ func InitRouter() *gin.Engine {
 		svcd.GET("/ram", sd.RAMCheck)
 		svcd.GET("/os", sd.OSCheck)
 	}
+	// the jwt middleware
+	authMiddleware, err := middleware.
 }

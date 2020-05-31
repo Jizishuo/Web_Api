@@ -1,11 +1,11 @@
 package jwtauth
 
 import (
+	"Web_Api/config"
 	"crypto/rsa"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"Web_Api/config"
 	"io/ioutil"
 	"net/http"
 	"strings"
