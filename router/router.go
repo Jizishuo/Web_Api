@@ -30,5 +30,6 @@ func InitRouter() *gin.Engine {
 		svcd.GET("/os", sd.OSCheck)
 	}
 	// the jwt middleware
-	authMiddleware, err := middleware.
+	authMiddleware, err := middleware.AuthInit()
+
 }
