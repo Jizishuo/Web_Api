@@ -5,6 +5,7 @@ import (
 	"Web_Api/middleware"
 	"github.com/gin-gonic/gin"
 	"Web_Api/handler"
+	"Web_Api/apis/monitor"
 	"log"
 )
 
@@ -35,6 +36,58 @@ func InitRouter() *gin.Engine {
 	if err!=nil {
 		log.Fatalln("JWT Error", err.Error())
 	}
-	// Refresh time can be longer than token timeout
 
+	r.POST("/login", authMiddleware.LoginHandler)
+	// Refresh time can be longer than token timeout
+	r.GET("/refresh_token", authMiddleware.RefreshHandler)
+	r.GET("/routes", Dashboard)
+
+	apiv1 := r.Group("/api/v1")
+	{
+		apiv1.GET("monitor/server", monitor.ServerInfo)
+	}
+}
+
+func Dashboard(c *gin.Context)  {
+	var user = make(map[string]interface{})
+	user["login_name"] = "amdin"
+	user["user_id"] = 1
+	user["user_name"] = "管理员"
+	user["dept_id"] = 1
+
+	var cmenuList = make(map[string]interface{})
+	cmenuList["children"] = nil
+	cmenuList["parent_id"] = 1
+	cmenuList["title"] = "用户管理"
+	cmenuList["name"] = "Sysuser"
+	cmenuList["icon"] = "user"
+	cmenuList["order_num"] = 1
+	cmenuList["id"] = 4
+	cmenuList["path"] = "sysuser"
+	cmenuList["component"] = "sysuser/index"
+
+	var lista = make([]interface{}, 1)
+	lista[0] = cmenuList
+
+	var menuList = make(map[string]interface{})
+	menuList["children"] = lista
+	menuList["parent_id"] = 1
+	menuList["name"] = "Upms"
+	menuList["title"] = "权限管理"
+	menuList["icon"] = "example"
+	menuList["order_num"] = 1
+	menuList["id"] = 4
+	menuList["path"] = "/upms"
+	menuList["component"] = "Layout"
+
+	var list = make([]interface{}, 1)
+	list[0] = menuList
+	var data = make(map[string]interface{})
+	data["user"] = user
+	data["menuList"] = list
+
+	var r = make(map[string]interface{})
+	r["code"] = 200
+	r["data"] = data
+	c.JSON(200, r)
 }
