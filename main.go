@@ -2,6 +2,7 @@ package main
 
 import (
 	"Web_Api/config"
+	"Web_Api/router"
 	"github.com/gin-gonic/gin"
 	"go-admin/models/gorm"
 	"log"
@@ -19,5 +20,5 @@ func main()  {
 		config.SetApplicationIsInit()
 	}
 
-	r := roou
+	r := router.InitRouter()
 }

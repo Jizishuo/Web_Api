@@ -6,10 +6,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"Web_Api/handler"
 	"Web_Api/apis/monitor"
+	"Web_Api/apis/system"
 	"log"
 )
 
 func InitRouter() *gin.Engine {
+
 	r := gin.New()
 	r.Use(middleware.LoggerToFile())
 	r.Use(middleware.CustomError)
@@ -45,6 +47,8 @@ func InitRouter() *gin.Engine {
 	apiv1 := r.Group("/api/v1")
 	{
 		apiv1.GET("monitor/server", monitor.ServerInfo)
+
+		apiv1.GET("/getCaptcha", system.GenerateCaptchaHandler)
 	}
 }
 
