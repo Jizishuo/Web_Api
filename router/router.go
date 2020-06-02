@@ -49,6 +49,7 @@ func InitRouter() *gin.Engine {
 		apiv1.GET("monitor/server", monitor.ServerInfo)
 
 		apiv1.GET("/getCaptcha", system.GenerateCaptchaHandler)
+		apiv1.GET("/db/tables/page", Get)
 	}
 }
 
