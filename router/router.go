@@ -1,6 +1,7 @@
 package router
 
 import (
+	. "Web_Api/apis/tools"
 	"Web_Api/handler/sd"
 	"Web_Api/middleware"
 	"github.com/gin-gonic/gin"
@@ -49,8 +50,13 @@ func InitRouter() *gin.Engine {
 		apiv1.GET("monitor/server", monitor.ServerInfo)
 
 		apiv1.GET("/getCaptcha", system.GenerateCaptchaHandler)
-		apiv1.GET("/db/tables/page", Get)
+		apiv1.GET("/db/tables/page", GetDBTableList)
+		apiv1.GET("/db/columns/page", GetDBColumnList)
+		// apiv1.GET("/sys/tables/page", )
 	}
+
+
+	return r
 }
 
 func Dashboard(c *gin.Context)  {
