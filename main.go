@@ -5,7 +5,7 @@ import (
 	"Web_Api/router"
 	"context"
 	"github.com/gin-gonic/gin"
-	"go-admin/models/gorm"
+	"Web_Api/models/gorm"
 	"log"
 	orm "Web_Api/database"
 	"net/http"
