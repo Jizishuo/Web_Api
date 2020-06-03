@@ -34,6 +34,7 @@ func InitRouter() *gin.Engine {
 		svcd.GET("/ram", sd.RAMCheck)
 		svcd.GET("/os", sd.OSCheck)
 	}
+
 	// the jwt middleware
 	authMiddleware, err := middleware.AuthInit()
 	if err!=nil {
@@ -52,7 +53,10 @@ func InitRouter() *gin.Engine {
 		apiv1.GET("/getCaptcha", system.GenerateCaptchaHandler)
 		apiv1.GET("/db/tables/page", GetDBTableList)
 		apiv1.GET("/db/columns/page", GetDBColumnList)
-		// apiv1.GET("/sys/tables/page", )
+		apiv1.GET("/sys/tables/page", GetSysTableList)
+		apiv1.POST("/sys/tables/info", InsertSysTable)
+		apiv1.PUT("/sys/tables/info", UpdateSysTable)
+		apiv1.DELETE("/sys/tables/info/:tableId", DeleteSysTables)
 	}
 
 

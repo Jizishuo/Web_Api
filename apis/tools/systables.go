@@ -7,6 +7,7 @@ import (
 	"Web_Api/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strings"
 )
 
 // @Summary 分页列表数据
@@ -72,3 +73,133 @@ func GetSysTables(c *gin.Context)  {
 // @Success 200 {string} string	"{"code": -1, "message": "添加失败"}"
 // @Router /api/v1/sys/tables/info [post]
 // @Security Bearer
+func InsertSysTable(c *gin.Context)  {
+	var data tools.SysTables
+	var dbTable tools.DBTables
+	var dbColumn tools.DBColumns
+	data.TableName = c.Request.FormValue("tables")
+	data.CreateBy = utils.GetUserIdStr(c)
+
+	dbTable.TableName = data.TableName
+	dbTable, err := dbTable.Get()
+	tablenamelist := strings.Split(dbColumn.TableName, "_")
+	for i:=0;i<len(tablenamelist);i++ {
+		strStart := string([]byte(tablenamelist[i][:1]))
+		strend := string([]byte(tablenamelist[i])[1:])
+		data.ClassName += strings.ToUpper(strStart) +strend
+		data.PackageName += strings.ToUpper(strStart) + strings.ToLower(strend)
+		data.ModuleName += strings.ToLower(strStart) + strings.ToLower(strend)
+	}
+	data.TplCategory = "crud"
+	data.Crud = true
+
+	dbcolumn, err := dbColumn.GetList()
+	data.CreateBy = utils.GetUserIdStr(c)
+	data.TableComment = dbTable.TableComment
+	if dbTable.TableComment == "" {
+		data.TableComment = data.ClassName
+	}
+	data.FunctionName = data.TableComment
+	data.BusinessName = data.ModuleName
+	data.IsLogicalDelete = "1"
+	data.LogicalDelete = true
+	data.LogicalDeleteColumn = "is_del"
+
+	data.FunctionAuthor = "wenjianzhang"
+	for i := 0; i < len(dbcolumn); i++ {
+		var column tools.SysColumns
+		column.ColumnComment = dbcolumn[i].ColumnComment
+		column.ColumnName = dbcolumn[i].ColumnName
+		column.ColumnType = dbcolumn[i].ColumnType
+		column.Sort = i + 1
+		column.Insert = true
+		column.IsInsert = "1"
+		column.QueryType = "EQ"
+		column.IsPk = "0"
+
+		namelist := strings.Split(dbcolumn[i].ColumnName, "_")
+		for i := 0; i < len(namelist); i++ {
+			strStart := string([]byte(namelist[i])[:1])
+			strend := string([]byte(namelist[i])[1:])
+			column.GoField += strings.ToUpper(strStart) + strend
+			if i == 0 {
+				column.JsonField = strings.ToLower(strStart) + strend
+			} else {
+				column.JsonField += strings.ToUpper(strStart) + strend
+			}
+		}
+		if strings.Contains(dbcolumn[i].ColumnKey, "PR") {
+			column.IsPk = "1"
+			column.Pk = true
+			data.PkColumn = dbcolumn[i].ColumnName
+			data.PkGoField = column.GoField
+			data.PkJsonField = column.JsonField
+		}
+		column.IsRequired = "0"
+		if strings.Contains(dbcolumn[i].IsNullable, "NO") {
+			column.IsRequired = "1"
+			column.Required = true
+		}
+
+		if strings.Contains(dbcolumn[i].ColumnType, "int") {
+			column.GoType = "int"
+			column.HtmlType = "input"
+		} else {
+			column.GoType = "string"
+			column.HtmlType = "input"
+		}
+
+		data.Columns = append(data.Columns, column)
+	}
+
+	result, err := data.Create()
+	pkg.HasError(err, "", -1)
+
+	var res app.Response
+	res.Data = result
+	res.Msg = "添加成功！"
+	c.JSON(http.StatusOK, res.ReturnOK())
+
+}
+
+// @Summary 修改表结构
+// @Description 修改表结构
+// @Tags 工具 - 生成表
+// @Accept  application/json
+// @Product application/json
+// @Param data body models.Dept true "body"
+// @Success 200 {string} string	"{"code": 200, "message": "添加成功"}"
+// @Success 200 {string} string	"{"code": -1, "message": "添加失败"}"
+// @Router /api/v1/sys/tables/info [put]
+// @Security Bearer
+func UpdateSysTable(c *gin.Context)  {
+	var data tools.SysTables
+	err := c.Bind(&data)
+	pkg.HasError(err , "数据解析失败", -1)
+	data.UpdateBy = utils.GetUserIdStr(c)
+	result, err := data.Update()
+	pkg.HasError(err, "", -1)
+	var res app.Response
+	res.Data = result
+	res.Msg = "修改成功"
+	c.JSON(http.StatusOK, res.ReturnOK())
+
+}
+
+// @Summary 删除表结构
+// @Description 删除表结构
+// @Tags 工具 - 生成表
+// @Param tableId path int true "tableId"
+// @Success 200 {string} string	"{"code": 200, "message": "删除成功"}"
+// @Success 200 {string} string	"{"code": -1, "message": "删除失败"}"
+// @Router /api/v1/sys/tables/info/{tableId} [delete]
+func DeleteSysTables(c *gin.Context)  {
+	var data tools.SysTables
+	id ,err := utils.StringToInt(c.Param("tableId"))
+	data.TableId = id
+	_, err = data.Delete()
+	pkg.HasError(err, "删除失败", 500)
+	var res app.Response
+	res.Msg = "删除成功"
+	c.JSON(http.StatusOK, res.ReturnOK())
+}
