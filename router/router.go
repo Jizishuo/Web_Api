@@ -1,6 +1,7 @@
 package router
 
 import (
+	"Web_Api/apis/system/dict"
 	. "Web_Api/apis/tools"
 	"Web_Api/handler/sd"
 	"Web_Api/middleware"
@@ -60,7 +61,7 @@ func InitRouter() *gin.Engine {
 		apiv1.GET("/sys/tables/info/:tabledId", GetSysTables)
 		apiv1.GET("/gen/preview/:tableId", Preview)
 		apiv1.GET("/menuTreeselect", system.GetMenuTreeelect)
-		apiv1.GET("/dict/databytype/:dictType", dict.getdic)
+		apiv1.GET("/dict/databytype/:dictType", dict.GetDictDataByDictType)
 	}
 
 
