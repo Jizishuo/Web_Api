@@ -1,6 +1,7 @@
 package dict
 
 import (
+	"Web_Api/models"
 	"Web_Api/pkg"
 	"Web_Api/pkg/app"
 	"Web_Api/pkg/utils"
