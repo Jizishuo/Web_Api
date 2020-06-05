@@ -64,6 +64,11 @@ func InitRouter() *gin.Engine {
 		apiv1.GET("/dict/databytype/:dictType", dict.GetDictDataByDictType)
 	}
 
+	auth := r.Group("/api/v1")
+	auth.Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthChecRole())
+	{
+		auth.GET("/deplList", system.)
+	}
 
 	return r
 }
