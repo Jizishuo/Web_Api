@@ -20,7 +20,7 @@ import (
 // @Router /api/v1/deptList [get]
 // @Security
 
-func GetDepList(c *gin.Context)  {
+func GetDeptList(c *gin.Context)  {
 	var Dept models.Dept
 	Dept.DeptName = c.Request.FormValue("deptName")
 	Dept.Status = c.Request.FormValue("status")
