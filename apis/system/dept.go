@@ -7,7 +7,7 @@ import (
 	"Web_Api/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"go-admin/pkg/app/msg"
+	"Web_Api/pkg/app/msg"
 )
 
 // @Summary 分页部门列表数据

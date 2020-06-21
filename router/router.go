@@ -73,6 +73,20 @@ func InitRouter() *gin.Engine {
 		auth.POST("/dept", system.InsertDept)
 		auth.PUT("/dept", system.UpdateDept)
 		auth.DELETE("/dept/:id", system.DeleteDept)
+
+		auth.GET("/dict/datalist", dict.GetDictDataList)
+		auth.GET("/dict/data/:dictCode", dict.GetDictData)
+		auth.POST("/dict/data", dict.InsertDictData)
+		auth.PUT("/dict/data/", dict.UpdateDictData)
+		auth.DELETE("/dict/data/:dictCode", dict.DeleteDictData)
+
+		auth.GET("/dict/typelist", dict.GetDictTypeList)
+		auth.GET("/dict/type/:dictId", dict.GetDictType)
+		auth.POST("/dict/type", dict.InsertDictType)
+		auth.PUT("/dict/type", dict.UpdateDictType)
+		auth.DELETE("/dict/type/:dictId", dict.DeleteDictType)
+
+		auth.GET("/dict/typeoptionselect", dict.GetDictTypeOptionSelect)
 	}
 
 	return r

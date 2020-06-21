@@ -9,7 +9,6 @@ var cfgDatabase *viper.Viper
 var cfgApplication *viper.Viper
 var cfgJwt *viper.Viper
 
-
 func init() {
 	viper.SetConfigName("settings")
 	viper.AddConfigPath("./config")
@@ -20,7 +19,7 @@ func init() {
 
 	cfgDatabase = viper.Sub("settings.database")
 	if cfgDatabase == nil {
-		panic("config not found setting.database")
+		panic("config not found settings.database")
 	}
 	DatabaseConfig = InitDatabase(cfgDatabase)
 
@@ -28,21 +27,21 @@ func init() {
 	if cfgApplication == nil {
 		panic("config not found settings.application")
 	}
-	ApplicationConfig = InitDatabase(cfgApplication)
+	ApplicationConfig = InitApplication(cfgApplication)
 
 	cfgJwt = viper.Sub("settings.jwt")
 	if cfgJwt == nil {
 		panic("config not found settings.jwt")
 	}
-	JwtConfig = InitDatabase(cfgJwt)
+	JwtConfig = InitJwt(cfgJwt)
 }
 
 func SetApplicationIsInit() {
 	SetConfig("./config","settings.application.isInit", false)
 }
 
-func SetConfig(configPath string, key string, value interface{}) {
+func SetConfig(configPath string,key string,value interface{}){
 	viper.AddConfigPath(configPath)
 	viper.Set(key, value)
-	viper.WatchConfig()
+	viper.WriteConfig()
 }
