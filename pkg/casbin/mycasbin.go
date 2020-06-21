@@ -3,9 +3,11 @@ package casbin
 import (
 	"Web_Api/config"
 	"fmt"
-	"github.com/casbin/casbin"
-	"github.com/go-kit/kit/endpoint"
+	"github.com/casbin/casbin/v2"
 	gormadapter "github.com/casbin/gorm-adapter/v2"
+	"github.com/go-kit/kit/endpoint"
+	_ "github.com/go-sql-driver/mysql"
+	"Web_Api/pkg/utils"
 )
 
 var Em endpoint.Middleware

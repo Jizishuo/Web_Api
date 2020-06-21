@@ -1,6 +1,10 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/jinzhu/gorm"
+	"Web_Api/pkg/utils"
+	)
+
 
 type DataPermission struct {
 	DataScope string
