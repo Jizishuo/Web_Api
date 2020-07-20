@@ -1,8 +1,8 @@
 package tools
 
 import (
-	"Web_Api/config"
-	orm "Web_Api/database"
+	"Web_Api/tools/config"
+	orm "Web_Api/global/orm"
 	"errors"
 )
 
@@ -24,7 +24,7 @@ type DBColumns struct {
 func (e *DBColumns) GetPage(pageSize , pageIndex int) ([]DBColumns, int, error) {
 	var doc []DBColumns
 	table := orm.Eloquent.Select("*").Table("information_schema.`COLUMNS`")
-	table = table.Where("table_schema=?", config.DatabaseConfig.Database)
+	table = table.Where("table_schema=?", config.DatabaseConfig.Name)
 	if e.TableName != "" {
 		return nil, 0, errors.New("table name cannot be empty!")
 	}
@@ -40,7 +40,7 @@ func (e *DBColumns) GetPage(pageSize , pageIndex int) ([]DBColumns, int, error) 
 func (e *DBColumns) GetList() ([]DBColumns, error)  {
 	var doc []DBColumns
 	table := orm.Eloquent.Select("*").Table("information_schema.columns")
-	table = table.Where("table_schema=?", config.DatabaseConfig.Database)
+	table = table.Where("table_schema=?", config.DatabaseConfig.Name)
 	if e.TableName == "" {
 		return nil, errors.New("table name cannot be empty")
 	}

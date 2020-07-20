@@ -1,7 +1,7 @@
 package tools
 
 import (
-	"Web_Api/config"
+	config "Web_Api/tools/config"
 	"Web_Api/models/tools"
 	"Web_Api/pkg"
 	"Web_Api/pkg/app"

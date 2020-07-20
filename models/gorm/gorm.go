@@ -1,7 +1,7 @@
 package gorm
 
 import (
-	"Web_Api/config"
+	"Web_Api/tools/config"
 	"Web_Api/models/tools"
 	"github.com/jinzhu/gorm"
 	"Web_Api/models"

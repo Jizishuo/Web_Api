@@ -30,7 +30,8 @@ var rootCmd = &cobra.Command{
 }
 
 func init()  {
-	rootCmd.AddCommand(api.)
+	rootCmd.AddCommand(api.StartCmd)
+	// rootCmd.AddCommand(migrate.StartCmd)
 }
 
 func Execute()  {

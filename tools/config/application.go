@@ -3,31 +3,49 @@ package config
 import "github.com/spf13/viper"
 
 type Application struct {
-	IsInit bool
-	ReadTimeout int
+	ReadTimeout   int
 	WriterTimeout int
-	Host string
-	Port string
-	Name string
-	JwtSecret string
-	LogPath string
-	Env string
-	EnvMsg string
+
+	Host          string
+	Port          string
+	Name          string
+	JwtSecret     string
+	Mode          string
+	DemoMsg       string
+	Domain        string
+	IsHttps       bool
 }
 
 func InitApplication(cfg *viper.Viper) *Application {
 	return &Application{
-		IsInit: cfg.GetBool("isInit"),
-		ReadTimeout: cfg.GetInt("readTimeout"),
+		ReadTimeout:   cfg.GetInt("readTimeout"),
 		WriterTimeout: cfg.GetInt("writerTimeout"),
-		Host: cfg.GetString("host"),
-		Port: cfg.GetString("port"),
-		Name: cfg.GetString("name"),
-		JwtSecret: cfg.GetString("jwtSecret"),
-		LogPath: cfg.GetString("logPath"),
-		Env: cfg.GetString("env"),
-		EnvMsg: cfg.GetString("envMsg"),
+		Host:          cfg.GetString("host"),
+		Port:          portDefault(cfg),
+		Name:          cfg.GetString("name"),
+		JwtSecret:     cfg.GetString("jwtSecret"),
+		Mode:          cfg.GetString("mode"),
+		DemoMsg:       cfg.GetString("demoMsg"),
+		Domain:        cfg.GetString("domain"),
+		IsHttps:       cfg.GetBool("ishttps"),
 	}
 }
 
 var ApplicationConfig = new(Application)
+
+func portDefault(cfg *viper.Viper) string {
+	if cfg.GetString("port") == "" {
+		return "8000"
+	} else {
+		return cfg.GetString("port")
+	}
+}
+
+
+func isHttpsDefault(cfg *viper.Viper) bool {
+	if cfg.GetString("ishttps") == "" ||  cfg.GetBool("ishttps") == false{
+		return false
+	} else {
+		return true
+	}
+}
