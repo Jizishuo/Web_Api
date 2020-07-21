@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	config2 "Web_Api/config"
+	"Web_Api/tools/config"
 	jwt "Web_Api/pkg/jwtauth"
 	"Web_Api/handler"
 	"time"
@@ -13,7 +13,7 @@ func AuthInit() (*jwt.GinJWTMiddleware, error) {
 		Key:[]byte("secret key"),
 		Timeout: time.Hour,
 		MaxRefresh: time.Hour,
-		IdentityKey: config2.ApplicationConfig.JwtSecret,
+		IdentityKey: config.ApplicationConfig.JwtSecret,
 		PayloadFunc: handler.PayloadFunc,
 		IdentityHandler: handler.IdentityHandler,
 		Authenticator:   handler.Authenticator,

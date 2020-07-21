@@ -1,7 +1,7 @@
 package jwtauth
 
 import (
-	"Web_Api/config"
+	"Web_Api/tools/config"
 	"crypto/rsa"
 	"errors"
 	"github.com/dgrijalva/jwt-go"

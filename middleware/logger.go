@@ -1,13 +1,11 @@
 package middleware
 
 import (
-	"Web_Api/config"
+	"Web_Api/tools/config"
 	"Web_Api/models"
-	"Web_Api/pkg/utils"
-	"fmt"
+	"Web_Api/tools"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"os"
 	"strings"
 	"time"
 )
@@ -19,18 +17,7 @@ var logger = logrus.New()
 // 日志记录到文件
 func LoggerToFile() gin.HandlerFunc {
 
-	// 写入文件
-	src, err := os.OpenFile(config.ApplicationConfig.LogPath, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
-	if err != nil {
-		fmt.Println("err:", err)
-	}
 
-	// 设置输出
-	logger.Out = src
-	
-	// 设置日志级别
-	logger.SetFormatter(&logrus.TextFormatter{})
-	
 	return func(c *gin.Context) {
 		// 开始时间
 		startTime := time.Now()
@@ -64,66 +51,61 @@ func LoggerToFile() gin.HandlerFunc {
 			reqMethod,
 			reqUrl,
 			)
-		logger.Infof("-")
-		fmt.Println(
-			startTime.Format("\n2006-01-02 15:04:05.9999"),
-			"[INFO]",
-			reqMethod,
-			reqUrl,
-			statusCode,
-			latencyTime,
-			reqUrl,
-			clientIP,
-			)
-
-		if c.Request.Method != "GET" && c.Request.Method != "OPTIONS" {
-			menu := models.Menu{}
-			menu.Path = reqUrl
-			menu.Action = reqMethod
-			menuList, _ := menu.Get()
-			sysOperLog := models.SysOperLog{}
-			sysOperLog.OperIp = clientIP
-			sysOperLog.OperLocation = utils.GetLocation(clientIP)
-			sysOperLog.Status = utils.IntToString(statusCode)
-			sysOperLog.OperName = utils.GetRoleName(c)
-			sysOperLog.RequestMethod = c.Request.Method
-			sysOperLog.OperUrl = reqUrl
-			if reqUrl == "/login" {
-				sysOperLog.BusinessType = "10"
-				sysOperLog.Title = "用户登录"
-				sysOperLog.OperName = "-"
-			} else if strings.Contains(reqUrl, "/api/v1/logout") {
-				// 判断字符串s是否包含子串substr
-				sysOperLog.BusinessType = "11"
-			} else if strings.Contains(reqUrl, "/api/v1/getCaptcha") {
-				sysOperLog.BusinessType = "12"
-				sysOperLog.Title = "验证码"
-			} else {
-				if reqMethod == "POST" {
-					sysOperLog.BusinessType = "1"
-				} else if reqMethod == "PUT" {
-					sysOperLog.BusinessType = "2"
-				} else if reqMethod == "DELETE" {
-					sysOperLog.BusinessType = "3"
-				}
-			}
-			sysOperLog.Method = reqMethod
-			if len(menuList) >0 {
-				sysOperLog.Title = menuList[0].Title
-			}
-			b, _ := c.Get("body")
-			sysOperLog.OperName, _ = utils.StructToJsonStr(b)
-			sysOperLog.CreateBy = utils.GetUserName(c)
-			sysOperLog.OperTime = utils.GetCurrntTime()
-			sysOperLog.LatencyTime = (latencyTime).String()
-			sysOperLog.UserAgent = c.Request.UserAgent()
-			if c.Err() == nil {
-				sysOperLog.Status = "0"
-			} else {
-				sysOperLog.Status = "1"
-			}
-			 _, _ = sysOperLog.Create()
+		if c.Request.Method != "GET" && c.Request.Method != "OPTIONS" && config.LogConfig.Operdb {
+			SetDBOperLog(c, clientIP, statusCode, reqUrl, reqMethod, latencyTime)
+		}
 		}
 
 	}
+
+
+
+// 写入操作日志表
+// 该方法后续即将弃用
+func SetDBOperLog(c *gin.Context, clientIP string, statusCode int, reqUri string, reqMethod string, latencyTime time.Duration) {
+	menu := models.Menu{}
+	menu.Path = reqUri
+	menu.Action = reqMethod
+	menuList, _ := menu.Get()
+	sysOperLog := models.SysOperLog{}
+	sysOperLog.OperIp = clientIP
+	sysOperLog.OperLocation = tools.GetLocation(clientIP)
+	sysOperLog.Status = tools.IntToString(statusCode)
+	sysOperLog.OperName = tools.GetUserName(c)
+	sysOperLog.RequestMethod = c.Request.Method
+	sysOperLog.OperUrl = reqUri
+	if reqUri == "/login" {
+		sysOperLog.BusinessType = "10"
+		sysOperLog.Title = "用户登录"
+		sysOperLog.OperName = "-"
+	} else if strings.Contains(reqUri, "/api/v1/logout") {
+		sysOperLog.BusinessType = "11"
+	} else if strings.Contains(reqUri, "/api/v1/getCaptcha") {
+		sysOperLog.BusinessType = "12"
+		sysOperLog.Title = "验证码"
+	} else {
+		if reqMethod == "POST" {
+			sysOperLog.BusinessType = "1"
+		} else if reqMethod == "PUT" {
+			sysOperLog.BusinessType = "2"
+		} else if reqMethod == "DELETE" {
+			sysOperLog.BusinessType = "3"
+		}
+	}
+	sysOperLog.Method = reqMethod
+	if len(menuList) > 0 {
+		sysOperLog.Title = menuList[0].Title
+	}
+	b, _ := c.Get("body")
+	sysOperLog.OperParam, _ = tools.StructToJsonStr(b)
+	sysOperLog.CreateBy = tools.GetUserName(c)
+	sysOperLog.OperTime = tools.GetCurrntTime()
+	sysOperLog.LatencyTime = (latencyTime).String()
+	sysOperLog.UserAgent = c.Request.UserAgent()
+	if c.Err() == nil {
+		sysOperLog.Status = "0"
+	} else {
+		sysOperLog.Status = "1"
+	}
+	_, _ = sysOperLog.Create()
 }
